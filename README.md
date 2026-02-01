@@ -10,9 +10,7 @@ Using:
 mwparserfromhell
 
 <br>
-<br>
-<h6>TODO:</h6>
-<br>
+<h3>TODO:</h3>
 <ul>
     <li>Fix JSON parsing</li>
     <li>Export JSON to .csv</li>
