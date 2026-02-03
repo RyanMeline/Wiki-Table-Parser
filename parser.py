@@ -67,34 +67,27 @@ def parse_table(text: str):
         rows.append(current_row)
 
     return headers, rows
-
-
-class Entity:
-    def __init__(self, name):
-        self.name = name
-        self.attributes = {}
-        self.links = []
-        self.categories = []
-        self.description = ""
-    
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "attributes": self.attributes,
-            "links": self.links,
-            "categories": self.categories,
-            "description": self.description
-        }
     
 def make_json_obj(headers, rows):
     objs = []
     for row in rows:
-        row2 = (row + [""] * len(headers))[:len(headers)]
-        objs.append(dict(zip(headers, row2)))
+        row_fixed = (row + [""] * len(headers))[:len(headers)]
+        objs.append(dict(zip(headers, row_fixed)))
     return objs
+
+def make_json_page(page_title, json_objs):
+    return {page_title: json_objs}
+
+#--------------------------------#
+#                                #
+#           Start Here           #
+#                                #
+#--------------------------------#
 
 with open(INPUT_FILE, "r", encoding="utf-8") as f:
     data = json.load(f)
+
+pages = []
 
 for page_title, page_info in data.items():
     wiki_text = page_info.get("content", "")
@@ -103,7 +96,7 @@ for page_title, page_info in data.items():
         
     tables = []
     for text in results:
-        if text.startswith(TABLE_NAME):
+        if "table" in text:
             tables.append(text)
     
     json_objs = []
@@ -111,6 +104,9 @@ for page_title, page_info in data.items():
     for table in tables:
         headers, rows = parse_table(table)
         json_objs.extend(make_json_obj(headers, rows))
+    
+    pages.append(make_json_page(page_title, json_objs))
+
 
 with open (OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(json_objs, f, indent=2, ensure_ascii=False)
+    json.dump(pages, f, indent=2, ensure_ascii=False)

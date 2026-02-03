@@ -2,7 +2,7 @@
 import requests
 import json
 # "Sunny", "Nephis", "Shadow_Slave_Wiki", 
-page_names = ["Sunny/Memories"]
+page_names = ["Sunny/Memories","Nephis/Memories","Cassie/Memories","Effie/Memories","Kai/Memories","Mordret/Memories","Morgan/Memories","Anvil/Memories","Rain/Memories"]
 page_names1 = ["Caduceus_Clay"]
 url = "https://shadowslave.fandom.com/api.php"
 url1 = "https://criticalrole.fandom.com/api.php"
