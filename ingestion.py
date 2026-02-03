@@ -1,6 +1,8 @@
 #Fetch info dumps from Shadow Slave's fandom site
 import requests
 import json
+import fandom_parser
+
 # "Sunny", "Nephis", "Shadow_Slave_Wiki", 
 OUTPUT_FILE = "fandom_dump.json"
 page_names = ["Sunny/Memories","Nephis/Memories","Cassie/Memories","Effie/Memories","Kai/Memories","Mordret/Memories","Morgan/Memories","Anvil/Memories","Rain/Memories"]
@@ -44,3 +46,5 @@ with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
 
 
 print(f"Downloaded {len(page_names)} pages.")
+
+fandom_parser.main()

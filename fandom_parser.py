@@ -85,35 +85,38 @@ def make_json_page(page_title, json_objs):
 #                                     #
 #-------------------------------------#
 
+def main():
+    if os.path.exists(INPUT_FILE):
+        with open(INPUT_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-if os.path.exists(INPUT_FILE):
-    with open(INPUT_FILE, "r", encoding="utf-8") as f:
-        data = json.load(f)
+        os.remove(INPUT_FILE)
 
-    os.remove(INPUT_FILE)
+        pages = []
 
-    pages = []
+        for page_title, page_info in data.items():
+            wiki_text = page_info.get("content", "")
 
-    for page_title, page_info in data.items():
-        wiki_text = page_info.get("content", "")
-
-        results = re.findall(r"\{\|(.*?)\|\}", wiki_text, re.DOTALL)
+            results = re.findall(r"\{\|(.*?)\|\}", wiki_text, re.DOTALL)
+                
+            tables = []
+            for text in results:
+                if "table" in text:
+                    tables.append(text)
             
-        tables = []
-        for text in results:
-            if "table" in text:
-                tables.append(text)
-        
-        json_objs = []
+            json_objs = []
 
-        for table in tables:
-            headers, rows = parse_table(table)
-            json_objs.extend(make_json_obj(headers, rows))
-        
-        pages.append(make_json_page(page_title, json_objs))
+            for table in tables:
+                headers, rows = parse_table(table)
+                json_objs.extend(make_json_obj(headers, rows))
+            
+            pages.append(make_json_page(page_title, json_objs))
 
 
-    with open (OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(pages, f, indent=2, ensure_ascii=False)
-else:
-    print(INPUT_FILE, "not found.")
+        with open (OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(pages, f, indent=2, ensure_ascii=False)
+    else:
+        print(INPUT_FILE, "not found.")
+
+if __name__ == "__main__":
+    main()
