@@ -1,5 +1,7 @@
 *.json
 *.txt
+*.pyc
+__pycache__
 
 # vim files
 *.*~
