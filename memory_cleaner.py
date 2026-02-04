@@ -17,33 +17,15 @@ INPUT_FILE = "json_formatted.json"
 def name_parse(name: str):
     
 #doesnt work properly (check: wooden staff)
+    
     name_split = []
-    if "|" in name:
+    if "|" in name and "id=" in name or "data-sort-value=" in name:
         name_split = name.split("|", 1)
         name = ""
         if "id=" in name_split[0] or "data-sort-value=" in name_split[0]:
             name_split[0] = ""
 
-
-# formats to remove
-# {{c|Name}}
-# {{cName}}
-# {{tooltip|Name|get rid of this}}
-# can be nested (drop of ichor) {{tooltip|Name{{c|info I want to keep}}|trash everything to the right of this}}
-
-# remove {{c and {{c| replace with a " " DO THIS FIRST BECAUSE NESTED {{}}
-# if either of those, remove }}
-# remove {{tooltip| (not case sensitive)
-
-
-
-    # if "{{tooltip|" in name:
-    #     name = name.split("{{tooltip|", 1)[1]
-    # if "<br>" in name:
-    #     name = name.split("<br>",1)[0]
-    # if "|" in name:
-    #     name = name.split("|",1)[0]
-
+# HTML STRIPPER
     testStr = ""
     for part in name_split:
         part = part.strip()
@@ -52,19 +34,19 @@ def name_parse(name: str):
         name += testStr
 
     wikicode = mw.parse(name)
+    for template in reversed(wikicode.filter_templates(recursive=True)):
+        try:
+            val = "" + str(template.get(1).value).strip()
+        except ValueError:
+            val = ""
+        
+        if template.name.strip().lower() == "tooltip":
+            wikicode.replace(template, val)
+        if template.name.strip().lower() == "c":
+            val = " | " + val
+            wikicode.replace(template,val)
 
-    for template in wikicode.filter_templates(recursive=False):
-        kept = []
-
-        for param in template.params:
-            value = param.value.strip()
-            if value:
-                kept.append(str(value))
-
-        wikicode.replace(template, " ".join(kept))
-
-
-    return str(wikicode)
+    return wikicode.strip_code().strip()
 
 def chapter_parse(chapter: str):
     return chapter
@@ -76,22 +58,41 @@ def desc_parse(desc: str):
     return desc
 
 
-def main():
-    if os.path.exists(INPUT_FILE):
-        with open(INPUT_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
+#def main():
+#    if os.path.exists(INPUT_FILE):
+with open(INPUT_FILE, "r", encoding="utf-8") as f:
+    data = json.load(f)
         # os.remove(INPUT_FILE)
-        os.remove("text.txt")
-        with open("text.txt", "a") as f:
-            for page in data:
-                for page_name, items in page.items():
-                    for item in items:
-                        f.write(name_parse(item["Name"]) + "\n")
-    else:
-        print(INPUT_FILE, "not found.")
+# os.remove("cleaned_memory_names.txt")
+
+all_pages = []
+
+# set to ademndum mode, change to write once json structures are built (in ademndum bc adding in a loop, can add json all at once)
+with open("cleaned_memory_names.json", "w") as f:
+#     print("test")
+    for page in data:
+        for page_name, items in page.items():
+            for item in items:
+                item["Name"] = name_parse(item["Name"])
+                
+                # inconsistant naming convention caused this
+                # can fix by making new json objects
+                # not doing that rn
+                if "Chapter Received" in item:
+                    item["Chapter Received"] = " " #chapter_parse(item["Chapter Received"])
+                elif "Chapter Appeared" in item:
+                    item["Chapter Appeared"] = " " #chapter_parse(item["Chapter Appearered"])    
+                else:
+                    item["Chapter"] = " " #chapter_parse(item["Chapter"])
+                item["Status"] = " " #status_parse(item["Status"])
+                item["Description"] = " " #desc_parse(item["Description"])
+    json.dump(data, f, ensure_ascii=False, indent = 2)
+    #f.write(data)
+ #   else:
+  #      print(INPUT_FILE, "not found.")
 
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 
