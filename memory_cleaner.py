@@ -90,9 +90,42 @@ def status_parse(status: str):
 
     return wikicode.strip()
 
-def desc_parse(desc: str):
-    desc = re.sub("<(.*?)>", " ", desc)
+def desc_parse(desc):
+    # Need to split up this section based on <div>'s
+    soup = BeautifulSoup(desc, 'html.parser')
+    # print(soup.prettify())
 
+    parsed = {}
+
+    # can add things that share names by just adding like " | " + text
+    # then do .strip( |) to strip spaces and | from the endif thats at the beginning
+
+    clear_divs = ""
+
+    # bone singer could be an issue
+
+    all_divs = soup.find_all("div", recursive = True)
+    # need to save beginning part and parse end with divs
+
+    old_div = ""
+    for div in reversed(all_divs):
+        # right now have <div> aoiwndoa <div> aidunwad </div> </div>
+        if old_div:
+            div = str(div).replace(old_div, " ")
+        old_div = str(div)
+        print(old_div)
+        
+        # grab inner, strip html, replace with 0
+       # print(div)
+        print("------------")
+
+
+    # Titles are stored in between the divs, then info after that div
+    # <div stuff>Description<div>information</div</div><div>Runes<div>'''Rank'''</div></div>
+    # I want to try and separate that out into different json sections, store it inside of desc, and return it
+    # use beautiful soup
+    # desc = re.sub("<(.*?)>", " ", desc)
+    print("-------------------------------------------------")
     return desc.strip()
 
 
@@ -112,7 +145,6 @@ with open("cleaned_memory_names.json", "w", encoding="utf-8") as f:
         for page_name, items in page.items():
             for item in items:
                 item["Name"] = name_parse(item["Name"])
-                
                 # inconsistant naming convention caused this
                 # can fix by making new json objects
                 # not doing that rn
