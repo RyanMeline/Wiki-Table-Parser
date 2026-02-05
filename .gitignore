@@ -1,1 +1,5 @@
 *.json
+.pyc
+.py~
+.un~
+
