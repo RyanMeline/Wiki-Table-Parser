@@ -7,11 +7,14 @@ Designed to parse tables and put the results into a structured json file.
 
 ingestion.py - Imports info dump from Shadow Slave's Fandom site
 <br>
-parser.py - Parse json dump and structure it
+fandom_parser.py - Parse json dump and structure it
+<br>
+memory_cleaner.py - Cut out HTML and MediaWiki formatting to clean results for easier searching/reading
 
 Using:
 <br>
-mwparserfromhell
+mwparserfromhell | MediaWiki parser
+BeatifulSoup4 | HTML parser
 
 <br>
 <h3>TODO:</h3>
