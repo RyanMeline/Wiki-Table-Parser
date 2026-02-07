@@ -20,6 +20,8 @@ def parse_table(text: str):
     rows = []
     current_row = []
     div_count = 0 #there are nested div's in some descriptions
+    current_column = 0 # used to deal with rowspan issues
+    in_rowspan = 0 # if its above 0, then in rowspan
 
     # first line is usually the {| class= stuff, so skip first line if its that
     if lines[0].startswith("!"):
@@ -43,6 +45,9 @@ def parse_table(text: str):
         line = line.rstrip()
         
         if line.startswith("|-"):
+	    if "rowspan=" in line:
+		rowspan_loc = line.find("rowspan=")
+		in_rowspan = line[rowspan_loc + 7] # has rowspan num
             div_count = 0
             if current_row:
                 rows.append(current_row)
