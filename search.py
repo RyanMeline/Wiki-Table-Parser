@@ -34,7 +34,7 @@ loop = True
 
 no_input = False
 while 1:
-    if mode == "memory" or mode == 'm':
+    if mode == "memory" or mode == 'm': # searches through all memories for search term
         mode = "m"
         break
     elif mode == "echo" or mode == "shadow" or mode == 'e' or mode == 's':
@@ -61,7 +61,7 @@ while 1:
         mode = input("Search for memory or an echo/shadow? ").strip().lower()
 
 if not no_input:
-    name = input("Enter name: ").strip().lower()
+    search_term = input("Enter name: ").strip().lower()
 print("-" * size.columns)
 
 #for future use
@@ -73,28 +73,28 @@ for pages in data:
         # Memories
         if mode == 'm' and 'memories' in page_name.lower():
             for item in page_items:
-                if name in item["Name"].strip().lower():
+                if search_term in item["Name"].strip().lower():
                     print_info(page_name, item, size)
         
         # Shadows or Echoes
         elif mode == 'e' and ('echo' in page_name.lower() or 'shadow' in page_name.lower()):
             for item in page_items:
-                if name in item["Name"].strip().lower():
+                if search_term in item["Name"].strip().lower():
                     print_info(page_name, item, size)
 
         # Creatures
         elif mode == 'c' and "creature" in page_name.lower():
             for item in page_items:
-                if name in item["Name"].strip().lower():
+                if search_term in item["Name"].strip().lower():
                     print_info(page_name, item, size)
 
         # Characters
-        elif mode == 'ch' and name in page_name.lower():
+        elif mode == 'ch' and search_term in page_name.lower():
             for item in page_items:
                 print_info(page_name, item, size)
 
         # Regions (Prints all creatures in given region)
-        elif mode == 'r' and name in page_name.lower():
+        elif mode == 'r' and search_term in page_name.lower():
             for item in page_items:
                 print_info(page_name, item, size)
 
@@ -105,4 +105,5 @@ for pages in data:
         # All (your search is checked against each page)
         elif mode == 'a':
             for item in page_items:
-                print_info(page_name, item, size)
+                if search_term in item["Name"].strip().lower():
+                    print_info(page_name, item, size)
