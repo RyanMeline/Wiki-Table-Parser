@@ -20,6 +20,10 @@ def parse_table(text: str):
     rows = []
     current_row = []
     div_count = 0 #there are nested div's in some descriptions
+    current_column = 0 # current column
+    rowspan_count = 0 # if its above 0, then in rowspan
+    rowspan_contents = "" # store what was said in the rowspan
+    rowspan_col = 0 # stores which column the rowspan was on
 
     # first line is usually the {| class= stuff, so skip first line if its that
     if lines[0].startswith("!"):
@@ -41,15 +45,31 @@ def parse_table(text: str):
     
     for line in lines[i:]:
         line = line.rstrip()
-        
+        current_column += 1 # on a new column, so inc
         if line.startswith("|-"):
             div_count = 0
+            current_column = 0
             if current_row:
                 rows.append(current_row)
                 current_row = []
             continue
             
+        if rowspan_count > 0 and rowspan_col == current_column: # if we inside a rowspan
+            print(rowspan_contents)
+            current_row.append(rowspan_contents)
+            current_column += 1
+            rowspan_count -= 1
+
+
         if line.startswith("|") and div_count == 0:
+
+            if "rowspan=" in line:
+                rowspan_loc = line.find("rowspan=")
+                rowspan_count = int(line[rowspan_loc + 9])-1 # has rowspan num
+                rowspan_contents = line[1:] #cuts the | off the front
+                rowspan_col = current_column
+
+            current_column += 1
             cell = line[1:].strip()
             current_row.append(cell)
             #replaced clean(cell) with cell
