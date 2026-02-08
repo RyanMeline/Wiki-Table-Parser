@@ -55,15 +55,16 @@ def parse_table(text: str):
             continue
             
         if rowspan_count > 0 and rowspan_col == current_column: # if we inside a rowspan
-            current_row += "\n" + rowspan_contents
+            current_row.append(rowspan_contents)
             current_column += 1
+            rowspan_count -= 1
 
 
         if line.startswith("|") and div_count == 0:
 
             if "rowspan=" in line:
                 rowspan_loc = line.find("rowspan=")
-                rowspan_count = int(line[rowspan_loc + 9]) # has rowspan num
+                rowspan_count = int(line[rowspan_loc + 9])-1 # has rowspan num
                 rowspan_contents = line
                 rowspan_col = current_column
 
